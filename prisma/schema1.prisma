@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client1"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  age       Int?
+  bio       String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  likesGiven    Like[]     @relation("Liker")
+  likesReceived Like[]     @relation("Liked")
+  matchesAsUser1 Match[]   @relation("MatchUser1")
+  matchesAsUser2 Match[]   @relation("MatchUser2")
+  messages      Message[]
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  likerId   Int
+  likedId   Int
+  createdAt DateTime @default(now())
+
+  liker User @relation("Liker", fields: [likerId], references: [id])
+  liked User @relation("Liked", fields: [likedId], references: [id])
+
+  @@unique([likerId, likedId])
+}
+
+model Match {
+  id        Int      @id @default(autoincrement())
+  user1Id   Int
+  user2Id   Int
+  createdAt DateTime @default(now())
+
+  user1 User @relation("MatchUser1", fields: [user1Id], references: [id])
+  user2 User @relation("MatchUser2", fields: [user2Id], references: [id])
+  messages Message[]
+
+  @@unique([user1Id, user2Id])
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  matchId   Int
+  senderId  Int
+  content   String
+  createdAt DateTime @default(now())
+
+  match  Match @relation(fields: [matchId], references: [id])
+  sender User  @relation(fields: [senderId], references: [id])
+}

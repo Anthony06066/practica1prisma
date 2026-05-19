@@ -1,0 +1,15 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/client2"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Music {
+  id     Int    @id @default(autoincrement())
+  title  String
+  artist String
+  genre  String?
+}
