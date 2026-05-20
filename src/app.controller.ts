@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Controller()
 export class AppController {
@@ -39,7 +40,8 @@ export class AppController {
     return this.appService.deleteUser(id);
   }
 
-  // Music endpoints
+  // Music endpoints (Protected with JWT)
+  @UseGuards(JwtAuthGuard)
   @Get('music')
   getAllMusic() {
     return this.appService.getAllMusic();

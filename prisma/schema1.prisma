@@ -21,6 +21,7 @@ model User {
   matchesAsUser1 Match[]   @relation("MatchUser1")
   matchesAsUser2 Match[]   @relation("MatchUser2")
   messages      Message[]
+  userRoles     UserRole[]
 }
 
 model Like {
@@ -57,4 +58,47 @@ model Message {
 
   match  Match @relation(fields: [matchId], references: [id])
   sender User  @relation(fields: [senderId], references: [id])
+}
+
+// =======================
+// RBAC (Role-Based Access Control)
+// =======================
+
+model Role {
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  description     String?
+  createdAt       DateTime         @default(now())
+  
+  userRoles       UserRole[]
+  rolePermissions RolePermission[]
+}
+
+model Permission {
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  description     String?
+  createdAt       DateTime         @default(now())
+  
+  rolePermissions RolePermission[]
+}
+
+model UserRole {
+  userId Int
+  roleId Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+}
+
+model RolePermission {
+  roleId       Int
+  permissionId Int
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
 }
